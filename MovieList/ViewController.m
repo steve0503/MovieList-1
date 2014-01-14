@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "MovieCenter.h"
+#import "ActorViewController.h"
 
 @interface ViewController ()<UITableViewDataSource, UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *table;
@@ -20,7 +21,11 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
+    ActorViewController *actorViewContoller = segue.destinationViewController;
     
+    UITableViewCell *selectedCell = (UITableViewCell *)sender;
+    NSIndexPath *selectedIndex = [self.table indexPathForCell:selectedCell];
+    actorViewContoller.movieIndex = selectedIndex.row;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
