@@ -12,7 +12,7 @@
 @implementation MovieCenter
 {
     sqlite3 *db;
-    // NSMutableArray *movieList;
+    NSMutableArray *_movieList;
 }
 
 static MovieCenter *_instance = nil;
@@ -27,6 +27,12 @@ static MovieCenter *_instance = nil;
     return _instance;
 }
 
+- (id)init {
+    self = [super init];
+    if (self) {
+    }
+    return self;
+}
 - (BOOL)openDB {
     NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *dbFilePath = [docPath stringByAppendingPathComponent:@"db.sqlite"];
@@ -77,23 +83,12 @@ static MovieCenter *_instance = nil;
 
 // DB 작업 모두 여기서 한다
 - (NSInteger)getNumberOfMovies {
-    NSString *queryStr = @"SELECT count(rowid)  FROM MOVIE";
-    sqlite3_stmt *stmt;
-    int ret = sqlite3_prepare_v2(db, [queryStr UTF8String], -1, &stmt, NULL);
-    
-    NSAssert2(SQLITE_OK == ret, @"Error(%d) on resolving data : %s", ret,sqlite3_errmsg(db));
-    
-    NSInteger count;
-    while (SQLITE_ROW == sqlite3_step(stmt)) {
-        count = sqlite3_column_int(stmt, 0);
-    }
-    
-    sqlite3_finalize(stmt);
-    return count;
+    return _movieList.count;
 }
 
-- (NSString *)getNameOfMovieAtId:(NSInteger)rowId {
-    NSString *queryStr = [NSString stringWithFormat:@"SELECT rowid, title FROM MOVIE where rowid=%d", (int)rowId];
+- (void)fetchMovies {
+    _movieList = [[NSMutableArray alloc] init];
+    NSString *queryStr = @"SELECT rowid, title FROM MOVIE";
     sqlite3_stmt *stmt;
     int ret = sqlite3_prepare_v2(db, [queryStr UTF8String], -1, &stmt, NULL);
     
@@ -102,28 +97,13 @@ static MovieCenter *_instance = nil;
     while (SQLITE_ROW == sqlite3_step(stmt)) {
         char *title = (char *)sqlite3_column_text(stmt, 1);
         titleString = [NSString stringWithCString:title encoding:NSUTF8StringEncoding];
+        [_movieList addObject:titleString];
     }
-    
     sqlite3_finalize(stmt);
-    return titleString;
 }
 
 - (NSString *)getNameOfMovieAtIndex:(NSInteger)index {
-    NSString *queryStr = [NSString stringWithFormat:@"SELECT rowid, title FROM MOVIE limit %d, 1", (int)index];
-    sqlite3_stmt *stmt;
-    int ret = sqlite3_prepare_v2(db, [queryStr UTF8String], -1, &stmt, NULL);
-    
-    NSAssert2(SQLITE_OK == ret, @"Error(%d) on resolving data : %s", ret,sqlite3_errmsg(db));
-    
-    NSString *titleString;
-    while (SQLITE_ROW == sqlite3_step(stmt)) {
-        char *title = (char *)sqlite3_column_text(stmt, 1);
-        titleString = [NSString stringWithCString:title encoding:NSUTF8StringEncoding];
-        
-    }
-    
-    sqlite3_finalize(stmt);
-    return titleString;
+    return _movieList[index];
 }
 
 - (NSInteger)getNumberOfActorsInMovie:(NSInteger)movieIndex {
@@ -172,6 +152,22 @@ static MovieCenter *_instance = nil;
     }
     NSInteger movieID = (NSInteger)sqlite3_last_insert_rowid(db);
     return movieID;
+}
+
+- (NSString *)getNameOfMovieAtId:(NSInteger)rowId {
+    NSString *queryStr = [NSString stringWithFormat:@"SELECT rowid, title FROM MOVIE where rowid=%d", (int)rowId];
+    sqlite3_stmt *stmt;
+    int ret = sqlite3_prepare_v2(db, [queryStr UTF8String], -1, &stmt, NULL);
+    
+    NSAssert2(SQLITE_OK == ret, @"Error(%d) on resolving data : %s", ret,sqlite3_errmsg(db));
+    NSString *titleString;
+    while (SQLITE_ROW == sqlite3_step(stmt)) {
+        char *title = (char *)sqlite3_column_text(stmt, 1);
+        titleString = [NSString stringWithCString:title encoding:NSUTF8StringEncoding];
+    }
+    
+    sqlite3_finalize(stmt);
+    return titleString;
 }
 
 @end

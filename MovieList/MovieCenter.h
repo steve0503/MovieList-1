@@ -10,13 +10,14 @@
 
 @interface MovieCenter : NSObject
 
+- (void)fetchMovies;
 - (NSInteger)addMovieWithName:(NSString *)name;
 - (NSInteger)getNumberOfMovies;
 - (NSString *)getNameOfMovieAtId:(NSInteger)index;
 - (NSString *)getNameOfMovieAtIndex:(NSInteger)index;
 - (NSInteger)getNumberOfActorsInMovie:(NSInteger)movieIndex;
 - (NSString *)getNameOfActorAtIndex:(NSInteger)index inMovie:(NSInteger)movieIndex;
-- (NSInteger)addActorWithName:(NSString *)name inMovie:(NSInteger)movieIndex; 
+- (NSInteger)addActorWithName:(NSString *)name inMovie:(NSInteger)movieIndex;
 + (id)sharedMovieCenter;
 
 @end

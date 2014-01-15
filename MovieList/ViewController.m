@@ -23,13 +23,15 @@
 {
     ActorViewController *actorViewContoller = segue.destinationViewController;
     
-    UITableViewCell *selectedCell = (UITableViewCell *)sender;
-    NSIndexPath *selectedIndex = [self.table indexPathForCell:selectedCell];
+    //    UITableViewCell *selectedCell = (UITableViewCell *)sender;
+    //    NSIndexPath *selectedIndex = [self.table indexPathForCell:selectedCell];
+    NSIndexPath *selectedIndex = [self.table indexPathForSelectedRow];
     actorViewContoller.movieIndex = selectedIndex.row;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [_movieCenter addMovieWithName:textField.text];
+    [_movieCenter fetchMovies];
     [self.table reloadData];
     textField.text = @"";
     [textField resignFirstResponder];
@@ -50,6 +52,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     _movieCenter = [MovieCenter sharedMovieCenter];
+    [_movieCenter fetchMovies];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
